@@ -13,6 +13,14 @@ translator = googletrans.Translator()
 
 bot = commands.Bot(command_prefix='!')
 
+@bot.command(name="jc", help="Alexandria joins voice channel.")
+async def join(ctx):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+@bot.command(name="lc", help="Alexandria leaves voice channel.")
+async def leave(ctx):
+    await ctx.voice_client.disconnect()
+
 @bot.command(name="tr", help="Translates from auto detected language to a specified language.")
 async def translate_func(ctx, i, x):
     tr = translator.translate(text= x, dest=i, src="auto")
@@ -34,6 +42,12 @@ async def on_translation_error(ctx, error):
 async def on_parse_error(ctx, error):
     await ctx.send("I'm sorry, I couldn't find that article. please remember that I only search anglophone wikipedia and if your article is more than one word it must be wrapped in quotation marks.") 
 
+
+@join.error
+async def on_join_error(ctx, error):
+    await ctx.send("I'm sorry I can't join the voice channel you're in at the moment, please double check permissions and try again.")
+
+
 bot.run(TOKEN)
 
 
@@ -44,5 +58,10 @@ bot.run(TOKEN)
     #pip install -U python-dotenv
     #pip install discord.py
     #pip install beautifulsoup4
+    #pip install wit
+    #pip install pynacl
     #A separate file in the same directory named ".env" 
         #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
+
+
+#To do: fix permission check before joining voice channel.
