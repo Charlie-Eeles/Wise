@@ -1,5 +1,9 @@
 import os
 import googletrans
+import requests
+import sys
+import webbrowser
+import bs4
 from discord.ext import commands
 from dotenv import load_dotenv
 
@@ -9,16 +13,29 @@ translator = googletrans.Translator()
 
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name='tr', help='Translates from auto detected language to a specified language.')
+@bot.command(name="tr", help="Translates from auto detected language to a specified language.")
 async def translate_func(ctx, i, x):
     tr = translator.translate(text= x, dest=i, src="auto")
     await ctx.send(f"'{tr.text}' translated to {i} from {tr.src}")
 
+@bot.command(name="wi", help="Scrapes wikipedia for the first three sentences of a description.")
+async def parse(ctx, x):
+    res = requests.get("https://en.wikipedia.org/wiki/"+x)
+    info = bs4.BeautifulSoup(res.text, "html.parser", parse_only=bs4.SoupStrainer("p"))
+    text = bs4.BeautifulSoup.get_text(info)
+    final_text = text.split(". ",3)[:3]
+    await ctx.send(f"{final_text[0]}. {final_text[1]}. {final_text[2]}.")
+
 @translate_func.error
-async def on_command_error(ctx, error):
-    await ctx.send("An error has been raised, please follow the syntax of '!tr target-language text-to-translate', if that still doesn't work then the language you're trying to translate from or to might not be supported.")
+async def on_translation_error(ctx, error):
+    await ctx.send("An error has been raised, please follow the syntax of '!tr target-language text-to-translate', if that still doesn't work then the language you're trying to translate from or translate to might not be supported.")
+
+@parse.error
+async def on_parse_error(ctx, error):
+    await ctx.send("I'm sorry, I couldn't find that article. please remember that I only search anglophone wikipedia and if your article is more than one word it must be wrapped in quotation marks.") 
 
 bot.run(TOKEN)
+
 
 
 
@@ -26,5 +43,6 @@ bot.run(TOKEN)
     #pip install googletrans
     #pip install -U python-dotenv
     #pip install discord.py
+    #pip install beautifulsoup4
     #A separate file in the same directory named ".env" 
         #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
