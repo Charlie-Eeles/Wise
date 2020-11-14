@@ -20,3 +20,11 @@ async def on_command_error(ctx, error):
 
 bot.run(TOKEN)
 
+
+
+#Required for development
+    #pip install googletrans
+    #pip install -U python-dotenv
+    #pip install discord.py
+    #A separate file in the same directory named ".env" 
+        #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
