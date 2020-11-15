@@ -21,7 +21,7 @@ bot = commands.Bot(command_prefix='!')
 async def join(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
-@bot.command(name="lc", help="Wise leaves voice channel.")
+@bot.command(name="ec", help="Wise leaves voice channel.")
 async def leave(ctx):
     await ctx.voice_client.disconnect()
 
@@ -41,8 +41,12 @@ async def parse(ctx, x):
 @bot.command(name="cv", help="Converts units from x to y")
 async def convert_func(ctx, x, y):
     ans = float(converts(x, y))
-    await ctx.send(f"{ans:.2f}")
+    await ctx.send(f"{x} is {ans:.2f}{y}'s")
     
+@bot.command(name="file_bug_report", help="file bug report")
+async def file_bug(ctx):
+    await ctx.send("no")
+#This is to mess with my friends
 
 @translate_func.error
 async def on_translation_error(ctx, error):
