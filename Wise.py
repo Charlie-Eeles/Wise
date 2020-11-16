@@ -1,3 +1,6 @@
+# -------------------------------------------------------------
+# Import Statements
+# -------------------------------------------------------------
 import os
 import googletrans
 import requests
@@ -9,12 +12,17 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from unit_converter.converter import convert, converts
 
+# -------------------------------------------------------------
+# Keys and related functions
+# -------------------------------------------------------------
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 # WIT_TOKEN = os.getenv("WIT_TOKEN")
 # witclient = Wit(WIT_TOKEN)
-translator = googletrans.Translator()
 
+# -------------------------------------------------------------
+# Bot commands 
+# -------------------------------------------------------------
 bot = commands.Bot(command_prefix='!')
 
 @bot.command(name="jc", help="Wise joins voice channel.")
@@ -27,6 +35,7 @@ async def leave(ctx):
 
 @bot.command(name="tr", help="Translates from auto detected language to a specified language.")
 async def translate_func(ctx, i, x):
+    translator = googletrans.Translator()
     tr = translator.translate(text= x, dest=i, src="auto")
     await ctx.send(f"'{tr.text}' translated to {i} from {tr.src}")
 
@@ -48,6 +57,9 @@ async def file_bug(ctx):
     await ctx.send("no")
 #This is to mess with my friends
 
+# -------------------------------------------------------------
+# Error catch functions
+# -------------------------------------------------------------
 @translate_func.error
 async def on_translation_error(ctx, error):
     await ctx.send("An error has been raised, please follow the syntax of '!tr target-language text-to-translate', if that still doesn't work then the language you're trying to translate from or translate to might not be supported.")
@@ -64,11 +76,11 @@ async def on_join_error(ctx, error):
 async def on_convert_error(ctx, error):
     await ctx.send("Either the units you're using are unsupported or incompatible, please try again with new units.")
 
+# -------------------------------------------------------------
+# Run command (Keep at the end.)
+# -------------------------------------------------------------
 bot.run(TOKEN)
-
-
-
-
+# -------------------------------------------------------------
 #Required for development
     #pip install googletrans
     #pip install -U python-dotenv
