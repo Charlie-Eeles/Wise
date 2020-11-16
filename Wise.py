@@ -41,10 +41,11 @@ async def translate_func(ctx, i, x):
 
 @bot.command(name="wi", help="Scrapes wikipedia for the first three sentences of a description.")
 async def parse(ctx, x):
+    x.replace(" ", "_")
     res = requests.get("https://en.wikipedia.org/wiki/"+x)
     info = bs4.BeautifulSoup(res.text, "html.parser", parse_only=bs4.SoupStrainer("p"))
     text = bs4.BeautifulSoup.get_text(info)
-    final_text = text.split(". ",3)[:3]
+    final_text = text.replace("...", ".").split(".",3)[:3]
     await ctx.send(f"{final_text[0]}. {final_text[1]}. {final_text[2]}.")
 
 @bot.command(name="cv", help="Converts units from x to y")
