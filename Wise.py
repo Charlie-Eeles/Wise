@@ -101,8 +101,8 @@ async def translate_func(ctx, i, x):
 
 @bot.command(name="wi", help="Scrapes wikipedia for the first three sentences of a description.")
 async def parse(ctx, x):
-    x.replace(" ", "_")
-    url = "https://en.wikipedia.org/wiki/"+x
+    i = x.replace(" ", "_")
+    url = "https://en.wikipedia.org/wiki/"+i
     res = requests.get(url)
     info = bs4.BeautifulSoup(res.text, "html.parser", parse_only=bs4.SoupStrainer("p"))
     text = bs4.BeautifulSoup.get_text(info)
