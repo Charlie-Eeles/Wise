@@ -28,19 +28,44 @@ discord_database = cluster["Discord"]
 reminder_collection = discord_database["Reminders"]
 # WIT_TOKEN = os.getenv("WIT_TOKEN")
 # witclient = Wit(WIT_TOKEN)
-
+client = discord.Client()
 # -------------------------------------------------------------
 # Bot commands 
-# -------------------------------------------------------------
+# # -------------------------------------------------------------
+reminder_message = ""
+
+async def reminder_poster():
+    while not client.is_closed():
+        try:
+            if reminder_collection.find_one({"_id":int(time.time())}) != None: 
+                x = reminder_collection.find_one({"_id":int(time.time())}) 
+                print(x["message"])
+                global reminder_message
+                reminder_message = x["message"]
+                reminder_collection.delete_one(x)
+            await asyncio.sleep(1)
+        except Exception as e:
+            print(e)
+            await asyncio.sleep(1)
+
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name="rm", help="Set a reminder for yourself.")
+@bot.command(name="init", help="Initilises reminders")
+async def init(ctx):
+    while not client.is_closed():
+        global reminder_message
+        if reminder_message != "":
+            await ctx.send(reminder_message) 
+            reminder_message = ""
+        await asyncio.sleep(1)
+
+@bot.command(name="rem", help="Set a reminder for yourself.")
 async def reminder_func(ctx, x, y):
     x_var = int(x)
     unit = str(y)
     if unit == "sc" or unit == "second" or unit == "seconds":
         time_in_secs = x_var
-    elif unit == "mn" or unit == "minute" or unit == "minutes":
+    elif unit == "mi" or unit == "minute" or unit == "minutes":
         time_in_secs = (x_var * 60)
     elif unit == "hr" or unit == "hour" or unit == "hours":
         time_in_secs = (x_var * 3600)
@@ -115,6 +140,7 @@ async def on_convert_error(ctx, error):
 # -------------------------------------------------------------
 # Run command (Keep at the end.)
 # -------------------------------------------------------------
+client.loop.create_task(reminder_poster())
 bot.run(TOKEN)
 # -------------------------------------------------------------
 #Required for development
