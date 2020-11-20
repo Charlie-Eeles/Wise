@@ -7,16 +7,25 @@ import requests
 import sys
 import webbrowser
 import bs4
+import time
+import asyncio
+import pymongo
+import discord
+from pymongo import MongoClient
 from wit import Wit
 from discord.ext import commands
 from dotenv import load_dotenv
 from unit_converter.converter import convert, converts
 
 # -------------------------------------------------------------
-# Keys and related functions
+# Keys, related functions and global declarations
 # -------------------------------------------------------------
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+MONGO = os.getenv("MONGO")
+cluster = MongoClient(MONGO)
+discord_database = cluster["Discord"]
+reminder_collection = discord_database["Reminders"]
 # WIT_TOKEN = os.getenv("WIT_TOKEN")
 # witclient = Wit(WIT_TOKEN)
 
@@ -24,6 +33,32 @@ TOKEN = os.getenv("DISCORD_TOKEN")
 # Bot commands 
 # -------------------------------------------------------------
 bot = commands.Bot(command_prefix='!')
+
+@bot.command(name="rm", help="Set a reminder for yourself.")
+async def reminder_func(ctx, x, y):
+    x_var = int(x)
+    unit = str(y)
+    if unit == "sc" or unit == "second" or unit == "seconds":
+        time_in_secs = x_var
+    elif unit == "mn" or unit == "minute" or unit == "minutes":
+        time_in_secs = (x_var * 60)
+    elif unit == "hr" or unit == "hour" or unit == "hours":
+        time_in_secs = (x_var * 3600)
+    elif unit == "dy" or unit == "day" or unit == "days":
+        time_in_secs = (x_var * 86400)
+    elif unit == "wk" or unit == "week" or unit == "weeks":
+        time_in_secs = (x_var * 604800)
+    elif unit == "mn" or unit == "month" or unit == "months":
+        time_in_secs = (x_var * 2629743)
+    elif unit == "yr" or unit == "year" or unit == "years":
+        time_in_secs = (x_var * 31556926)
+    else:
+        await ctx.send("Unsupported time format; time must be in 1 of: seconds, minutes, hours, days, weeks, months or years.")
+        return
+    time_to_remind = (int(time.time()) + time_in_secs)
+    comment_info = {"_id":time_to_remind, "message": ctx.message.content}
+    reminder_collection.insert_one(comment_info)
+    await ctx.send(f"I will remind you in {x} {y}.")
 
 @bot.command(name="jc", help="Wise joins voice channel.")
 async def join(ctx):
@@ -90,6 +125,8 @@ bot.run(TOKEN)
     #pip install wit
     #pip install pynacl
     #pip install unit-converter
+    #pip install pymongo
+    #pip install pymongo[srv]
     #A separate file in the same directory named ".env" 
         #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
 
