@@ -100,14 +100,14 @@ async def translate_func(ctx, i, x):
     await ctx.send(f"'{tr.text}' translated to {i} from {tr.src}")
 
 @bot.command(name="wi", help="Scrapes wikipedia for the first three sentences of a description.")
-async def parse(ctx, x):
+async def parse(ctx,*, x):
     i = x.replace(" ", "_")
     url = "https://en.wikipedia.org/wiki/"+i
     res = requests.get(url)
     info = bs4.BeautifulSoup(res.text, "html.parser", parse_only=bs4.SoupStrainer("p"))
     text = bs4.BeautifulSoup.get_text(info)
     final_text = text.replace("...", ".").split(".",3)[:3]
-    await ctx.send(f"{final_text[0]}. {final_text[1]}. {final_text[2]}\nRead more: {url}")
+    await ctx.send(f"{final_text[0]}. {final_text[1]}. {final_text[2]}\nRead more: <{url}>")
 
 @bot.command(name="cv", help="Converts units from x to y")
 async def convert_func(ctx, x, y):
