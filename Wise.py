@@ -32,17 +32,20 @@ client = discord.Client()
 # -------------------------------------------------------------
 # Bot commands 
 # # -------------------------------------------------------------
-reminder_message = ""
-
 async def reminder_poster():
     while not client.is_closed():
         try:
             if reminder_collection.find_one({"_id":int(time.time())}) != None: 
-                x = reminder_collection.find_one({"_id":int(time.time())}) 
-                print(x["message"])
+                x = reminder_collection.find_one({"_id":int(time.time())})
                 global reminder_message
                 reminder_message = x["message"]
+                server_id = x["server"]
+                channel_id = x["channel"]
+                message_id = x["message_id"]
                 reminder_collection.delete_one(x)
+                channel = bot.get_channel(int(x["channel"]))
+                await channel.send(f"{reminder_message} https://discordapp.com/channels/{server_id}/{channel_id}/{message_id}")
+            
             await asyncio.sleep(1)
         except Exception as e:
             print(e)
@@ -50,40 +53,46 @@ async def reminder_poster():
 
 bot = commands.Bot(command_prefix='!')
 
-@bot.command(name="init", help="Initilises reminders")
-async def init(ctx):
-    while not client.is_closed():
-        global reminder_message
-        if reminder_message != "":
-            await ctx.send(reminder_message) 
-            reminder_message = ""
-        await asyncio.sleep(1)
-
 @bot.command(name="rem", help="Set a reminder for yourself.")
-async def reminder_func(ctx, x, y):
+async def reminder_func(ctx, x, y, *, arg):
     x_var = int(x)
     unit = str(y)
+    if x_var < 1:
+        await ctx.send("Invalid time, must be a number greater than 1.")
+        return
+    def simplifier(i,z):
+        if i==1:
+            return z
+        else:
+            return z+"s" 
     if unit == "sc" or unit == "second" or unit == "seconds":
         time_in_secs = x_var
+        unit = simplifier(x_var, "second")
     elif unit == "mi" or unit == "minute" or unit == "minutes":
         time_in_secs = (x_var * 60)
+        unit = simplifier(x_var, "minute")
     elif unit == "hr" or unit == "hour" or unit == "hours":
         time_in_secs = (x_var * 3600)
+        unit = simplifier(x_var, "hour")
     elif unit == "dy" or unit == "day" or unit == "days":
         time_in_secs = (x_var * 86400)
+        unit = simplifier(x_var, "day")
     elif unit == "wk" or unit == "week" or unit == "weeks":
         time_in_secs = (x_var * 604800)
+        unit = simplifier(x_var, "week")
     elif unit == "mn" or unit == "month" or unit == "months":
         time_in_secs = (x_var * 2629743)
+        unit = simplifier(x_var, "month")
     elif unit == "yr" or unit == "year" or unit == "years":
         time_in_secs = (x_var * 31556926)
+        unit = simplifier(x_var, "year")
     else:
-        await ctx.send("Unsupported time format; time must be in 1 of: seconds, minutes, hours, days, weeks, months or years.")
+        await ctx.send("Unsupported time format; time must be in one of: seconds, minutes, hours, days, weeks, months or years.")
         return
     time_to_remind = (int(time.time()) + time_in_secs)
-    comment_info = {"_id":time_to_remind, "message": ctx.message.content}
+    comment_info = {"_id":time_to_remind, "message": arg,"server":ctx.message.guild.id, "channel": ctx.channel.id, "message_id": ctx.message.id}
     reminder_collection.insert_one(comment_info)
-    await ctx.send(f"I will remind you in {x} {y}.")
+    await ctx.send(f"I will remind you in {x} {unit}.")
 
 @bot.command(name="jc", help="Wise joins voice channel.")
 async def join(ctx):
@@ -125,6 +134,10 @@ async def file_bug(ctx, *, arg):
 # -------------------------------------------------------------
 # Error catch functions
 # -------------------------------------------------------------
+@reminder_func.error
+async def on_reminder_error(ctx, error):
+    await ctx.send("Invalid value for time, please enter a whole number greater than or equal to one.")
+
 @translate_func.error
 async def on_translation_error(ctx, error):
     await ctx.send("An error has been raised, please follow the syntax of '!tr target-language text-to-translate', if that still doesn't work then the language you're trying to translate from or translate to might not be supported.")
