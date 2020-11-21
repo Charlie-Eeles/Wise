@@ -113,11 +113,14 @@ async def parse(ctx,*, x):
 async def convert_func(ctx, x, y):
     ans = float(converts(x, y))
     await ctx.send(f"{x} is {ans:.2f}{y}'s")
-    
+
+
 @bot.command(name="file_bug_report", help="file bug report")
-async def file_bug(ctx):
-    await ctx.send("no")
-#This is to mess with my friends
+async def file_bug(ctx, *, arg):
+    user = bot.get_user(98322098304331776)
+    await user.send(f"{ctx.author} from {ctx.guild} has reported the following issue(s):\n{arg}")
+    await ctx.send("Your bug report has been submitted, thank you.")
+    
 
 # -------------------------------------------------------------
 # Error catch functions
