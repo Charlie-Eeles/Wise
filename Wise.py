@@ -58,7 +58,7 @@ async def reminder_func(ctx, x, y, *, arg):
     x_var = int(x)
     unit = str(y)
     if x_var < 1:
-        await ctx.send("Invalid time, must be a number greater than 1.")
+        await ctx.send("Invalid value for time, please enter a whole number greater than or equal to one.")
         return
     def simplifier(i,z):
         if i==1:
