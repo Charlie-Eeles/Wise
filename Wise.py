@@ -11,6 +11,7 @@ import time
 import asyncio
 import pymongo
 import discord
+import random
 from pymongo import MongoClient
 from wit import Wit
 from discord.ext import commands
@@ -28,7 +29,8 @@ discord_database = cluster["Discord"]
 reminder_collection = discord_database["Reminders"]
 # WIT_TOKEN = os.getenv("WIT_TOKEN")
 # witclient = Wit(WIT_TOKEN)
-client = discord.Client()
+intents = discord.Intents.all()
+client = discord.Client(intents=intents)
 # -------------------------------------------------------------
 # Bot commands 
 # # -------------------------------------------------------------
@@ -130,6 +132,29 @@ async def file_bug(ctx, *, arg):
     await user.send(f"{ctx.author} from {ctx.guild} has reported the following issue(s):\n{arg}")
     await ctx.send("Your bug report has been submitted, thank you.")
     
+@bot.command(name="alert", help="Pings someone by sending a dm")
+async def ping_func(ctx, arg):
+    try:
+        guild_obj = bot.get_guild(ctx.message.guild.id)
+        member_obj = await guild_obj.query_members(arg)
+        user = bot.get_user(member_obj[0].id)
+        await user.send(f"{ctx.author} from {ctx.guild} is trying to get your attention!")
+        await ctx.send("Alert sent!")
+    except:
+        await ctx.send("I don't know who that is.")    
+            
+@bot.command(name="flip", help="Flips a coin")
+async def flip_func(ctx):
+    x = random.randint(0,1)
+    await ctx.send("Flipping a coin...")
+    time.sleep(1)
+    await ctx.send("...")
+    time.sleep(1)
+    if x == 0:
+        await ctx.send("It's heads!")
+    else:
+        await ctx.send("It's tails!")
+        
 
 # -------------------------------------------------------------
 # Error catch functions
