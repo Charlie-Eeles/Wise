@@ -1,7 +1,7 @@
 # -------------------------------------------------------------
 # Import Statements
 # -------------------------------------------------------------
-import os
+import os 
 import googletrans
 import requests
 import sys
@@ -53,7 +53,7 @@ async def reminder_poster():
             print(e)
             await asyncio.sleep(1)
 
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix="!")
 
 @bot.command(name="rem", help="Set a reminder for yourself.")
 async def reminder_func(ctx, x, y, *, arg):
@@ -186,15 +186,6 @@ client.loop.create_task(reminder_poster())
 bot.run(TOKEN)
 # -------------------------------------------------------------
 #Required for development
-    #pip install googletrans
-    #pip install -U python-dotenv
-    #pip install discord.py
-    #pip install beautifulsoup4
-    #pip install wit
-    #pip install pynacl
-    #pip install unit-converter
-    #pip install pymongo
-    #pip install pymongo[srv]
     #A separate file in the same directory named ".env" 
         #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
 
