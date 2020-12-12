@@ -8,4 +8,3 @@ unit-converter
 pymongo
 pymongo[srv]
 
-@REM pip install -r req.bat

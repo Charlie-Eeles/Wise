@@ -188,6 +188,6 @@ bot.run(TOKEN)
 #Required for development
     #A separate file in the same directory named ".env" 
         #containing a variable "DISCORD_TOKEN = 'your-discord-bot-token'"
-
+    # pip install -r req.bat
 
 #To do: fix permission check before joining voice channel.
